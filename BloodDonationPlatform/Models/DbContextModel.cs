@@ -4,6 +4,8 @@ namespace BloodDonationPlatform.Models
 {
     public class DbContextModel : DbContext
     {
+        public DbSet<Donator> Donators { get; set; }
+        public DbSet<Donation> Donations { get; set; }
 
         public DbContextModel() : base()
         {

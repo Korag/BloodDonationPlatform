@@ -12,6 +12,7 @@ using FluentValidation.Results;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json;
 
 namespace BloodDonationPlatform.Controllers
 {
@@ -37,11 +38,30 @@ namespace BloodDonationPlatform.Controllers
                 visualizationModel.SelectedFiles = new List<String>();
             }
 
+            visualizationModel.DonatorsWithDonations = _context.GetDonatorsWithDonations(visualizationModel.SelectedFiles);
+
             visualizationModel.AvailableFiles = new List<SelectListItem>();
             visualizationModel.AvailableFiles = _context.GetFileNamesAsSelectList().ToList();
 
-            // pobieranie kolekcji do wyświetlenia
-            // defaultowo ładowane są wszystkie
+            // łączna ilość zebranej krwi przez wszystkich donatorów
+            var TotalAmountOfBlood = visualizationModel.DonatorsWithDonations.Sum(z => z.Donations.Sum(s => s.QuantityOfBlood));
+
+            // łączna zebrana ilość krwi w każdym z plików
+
+            // średnia oddawanej ilości krwi w każdym z plików
+
+            // liczba donacji na osobę
+
+            // średnia ilość oddanej krwi na osobę
+
+            // responsywność wykresów
+
+            // PANEL SZCZEGÓŁÓW POJEDYNCZEGO DONATORA -> COMPONENT
+
+            // 20 osób które oddały najwięcej krwi
+            var tmp = visualizationModel.DonatorsWithDonations.Select(z => new DataChartElement { category = z.FirstName[0] + ". " + z.LastName, value = z.Donations.Sum(s => s.QuantityOfBlood) }).OrderByDescending(z=> z.value).Take(20).ToList();
+
+            visualizationModel.Top20DonatorsSum =  JsonConvert.SerializeObject(tmp);
 
             return View(visualizationModel);
         }

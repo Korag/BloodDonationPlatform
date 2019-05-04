@@ -37,15 +37,17 @@ namespace BloodDonationPlatform.DAL
                     PlaceOfDonation = model.PlaceOfDonation,
                     QuantityOfBlood = model.QuantityOfBlood,
 
-                    DonatorId = donator.DonatorId,
-
                     OriginFileName = NameOfFile
                 };
 
                 if(IfDonatorExists(donator))
                 {
                     AddNewDonator(donator);
+                    donation.DonatorId = donator.DonatorId;
                 }
+
+                Guid id = GetDonatorID(donator);
+                donation.DonatorId = id;
                 AddNewDonation(donation);
             }
         }
@@ -62,6 +64,12 @@ namespace BloodDonationPlatform.DAL
             {
                 return false;
             }
+        }
+
+        public Guid GetDonatorID(Donator donator)
+        {
+            return  _context.Donators.Where(z => z.FirstName == donator.FirstName && z.LastName == donator.LastName
+                                      && z.BloodGroup == donator.BloodGroup && z.BloodFactor == donator.BloodFactor).Select(z=> z.DonatorId).FirstOrDefault();
         }
 
         public void AddNewDonation(Donation donation)
@@ -115,6 +123,38 @@ namespace BloodDonationPlatform.DAL
         {
             var FileNames = _context.Donations.Select(z => z.OriginFileName).Distinct().ToList();
             return FileNames;
+        }
+
+        public ICollection<DonatorViewModel> GetDonatorsWithDonations(ICollection<string> FileNames)
+        {
+            List<DonatorViewModel> DonatorsWithDonations = new List<DonatorViewModel>();
+
+            foreach (var donator in _context.Donators)
+            {
+                DonatorViewModel _donator = new DonatorViewModel()
+                {
+                    DonatorId = donator.DonatorId,
+                    FirstName = donator.FirstName,
+                    LastName = donator.LastName,
+                    BloodGroup = donator.BloodGroup,
+                    BloodFactor = donator.BloodFactor,
+
+                    Donations = new List<Donation>()
+                };
+
+                if (FileNames.Count == 0)
+                {
+                    _donator.Donations = _context.Donations.Where(z => z.DonatorId == _donator.DonatorId).ToList();
+                }
+                else
+                {
+                    _donator.Donations = _context.Donations.Where(z => z.DonatorId == _donator.DonatorId && FileNames.Contains(z.OriginFileName)).ToList();
+                }
+
+                DonatorsWithDonations.Add(_donator);
+            }
+
+            return DonatorsWithDonations;
         }
 
     }

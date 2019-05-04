@@ -91,15 +91,15 @@
             var chart = am4core.create("chartdiv", am4charts.RadarChart);
             chart.scrollbarX = new am4core.Scrollbar();
 
-            var data = [];
+            var data = @Html.Raw(Model.Top20DonatorsSum);
 
-            for (var i = 0; i < 20; i++) {
-                data.push({ category: i, value: Math.round(Math.random() * 100) });
-            }
+            @*for (var i = 0; i < @Model.DonatorsWithDonations.Count; i++) {
+                data.push({ category: @Model.DonatorsWithDonations.ElementAt(), value: Math.round(Math.random() * 100) });
+            }*@
 
             chart.data = data;
             chart.radius = am4core.percent(100);
-            chart.innerRadius = am4core.percent(50);
+            chart.innerRadius = am4core.percent(70);
 
             // Create axes
             var categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
@@ -111,7 +111,7 @@
             categoryAxis.renderer.grid.template.disabled = true;
             //categoryAxis.renderer.labels.template.disabled = true;
             let labelTemplate = categoryAxis.renderer.labels.template;
-            labelTemplate.radius = am4core.percent(-60);
+            labelTemplate.radius = am4core.percent(-80);
             labelTemplate.location = 0.5;
             labelTemplate.relativeRotation = 90;
 

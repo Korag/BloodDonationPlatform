@@ -21,6 +21,22 @@ namespace BloodDonationPlatform.ViewModels
         //[Display(Name = "Obszar")]
         public IList<SelectListItem> AvailableFiles { get; set; }
 
+        //public ICollection<DataChartElement> Top20DonatorsSum { get; set; }
+
+        public string Top20DonatorsSum { get; set; }
+
+    }
+
+    public class DataChartElement
+    {
+        //public DataChartElement(string _category, decimal _value)
+        //{
+        //    this.category = _category;
+        //    this.value = _value;
+        //}
+
+        public string category { get; set; }
+        public decimal value { get; set; }
     }
 
 

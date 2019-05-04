@@ -16,5 +16,6 @@ namespace BloodDonationPlatform.DAL
 
         ICollection<SelectListItem> GetFileNamesAsSelectList();
         ICollection<string> GetFileNames();
+        ICollection<DonatorViewModel> GetDonatorsWithDonations(ICollection<string> FileNames);
     }
 }

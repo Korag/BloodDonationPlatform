@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using BloodDonationPlatform.DAL;
+using BloodDonationPlatform.Services;
 using BloodDonationPlatform.ViewModels;
 using CsvHelper;
 using CsvHelper.TypeConversion;
@@ -15,82 +16,34 @@ namespace BloodDonationPlatform.Controllers
     public class BloodDonationController : Controller
     {
         private IDbContext _context;
+        private CsvService _csvReader;
 
         public BloodDonationController()
         {
             _context = new EFDbContext();
+            _csvReader = new CsvService();
         }
 
-        public static Dictionary<int, string> IndexOfProperty = new Dictionary<int, string>
+        public IActionResult Index(string path)
         {
-            { 0, "FirstName" },
-            { 1, "LastName" },
-            { 2, "PESEL" },
-            { 3, "BloodGroup" },
-            { 4, "BloodFactor" },
-            { 5, "QuantityOfBlood" },
-            { 6, "DateOfDonation" },
-            { 7, "PlaceOfDonation" }
-       };
+            ReadFromCSVCollectionWithErrors records = new ReadFromCSVCollectionWithErrors();
 
-        public IActionResult Index()
-        {
-            List<ReadFromCSVViewModel> records = new List<ReadFromCSVViewModel>();
+            records = _csvReader.ReadContentOfCsvFile(@"C:\Users\user\Documents\Visual Studio 2017\Projects\BloodDonationPlatform\BloodDonationPlatform\wwwroot\CSV Test File\MOCK_DATA.csv");
 
-            // odczyt z pliku csv wyrzucic do jakiejs warstwy serwisow
-            using (var reader = new StreamReader(@"C:\Users\user\Documents\Visual Studio 2017\Projects\BloodDonationPlatform\BloodDonationPlatform\wwwroot\CSV Test File\MOCK_DATA.csv"))
+            if (records.Errors.Count == 0)
             {
                 try
                 {
-                    using (var csv = new CsvReader(reader))
-                    {
-                        //csv.Configuration.PrepareHeaderForMatch = (string header, int index) => header.ToLower();
-                        csv.Configuration.HasHeaderRecord = false;
-                        csv.Configuration.RegisterClassMap<ReadFromCSVViewModelMapper>();
-                        csv.Configuration.Delimiter = ",";
-                        csv.Configuration.MissingFieldFound = null;
-
-                        records = csv.GetRecords<ReadFromCSVViewModel>().ToList();
-
-                        ReadFromCSVValidator validator = new ReadFromCSVValidator();
-
-                        int rowNumber = 1;
-                        foreach (var record in records)
-                        {
-                            ValidationResult results = validator.Validate(record);
-
-                            if (!results.IsValid)
-                            {
-                                foreach (var failure in results.Errors)
-                                {
-                                    Console.WriteLine("Property " + failure.PropertyName + " failed validation. Error was: " + failure.ErrorMessage);
-                                    Console.WriteLine("Wrong value of input '" + failure.AttemptedValue + "'.");
-                                    Console.WriteLine("Row number in file " + rowNumber);
-                                    // break; return błędy w pliku takie i takie
-                                }
-                            }
-                            rowNumber++;
-                        }
-
-                    }
+                    _context.AddDataFromNewCSVFile(records.CollectionOfRecords);
                 }
-
-                catch (TypeConverterException ex)
+                catch (Exception e)
                 {
-                    Console.WriteLine("Property " + IndexOfProperty.GetValueOrDefault(ex.ReadingContext.CurrentIndex) + " failed validation. Error was: " + ex.Message);
-                    Console.WriteLine("Wrong value of input '" + ex.Text + "'.");
-                    Console.WriteLine("Row number in file " + ex.ReadingContext.Row + 1);
-                    // return błędy jak np jest złe rzutowanie na datę
-                    throw;
+                    // return błędy z zapisu do bazy
                 }
             }
-            try
+            else
             {
-                _context.AddDataFromNewCSVFile(records);
-            }
-            catch (Exception e)
-            {
-                // return błędy z zapisu do bazy
+                // records.Errors wyrzucone na widok
             }
 
             return View();

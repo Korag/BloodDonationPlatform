@@ -66,11 +66,11 @@ namespace BloodDonationPlatform.DAL
 
             if (Donator != null)
             {
-                return true;
+                return false;
             }
             else
             {
-                return false;
+                return true;
             }
         }
     }

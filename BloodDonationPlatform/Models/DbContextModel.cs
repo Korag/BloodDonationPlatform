@@ -20,7 +20,15 @@ namespace BloodDonationPlatform.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-           
+            modelBuilder.Entity<Donator>() .Property(z => z.FirstName).IsRequired();
+            modelBuilder.Entity<Donator>().Property(z => z.LastName).IsRequired();
+            modelBuilder.Entity<Donator>().Property(z => z.BloodGroup).IsRequired();
+            modelBuilder.Entity<Donator>().Property(z => z.BloodFactor).IsRequired();
+
+            modelBuilder.Entity<Donation>().Property(z => z.DonatorId).IsRequired();
+            modelBuilder.Entity<Donation>().Property(z => z.DateOfDonation).IsRequired();
+            modelBuilder.Entity<Donation>().Property(z => z.PlaceOfDonation).IsRequired();
+            modelBuilder.Entity<Donation>().Property(z => z.QuantityOfBlood).IsRequired();
         }
     }
 }

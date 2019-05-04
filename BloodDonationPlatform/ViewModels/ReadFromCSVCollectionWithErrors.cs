@@ -11,3 +11,4 @@ namespace BloodDonationPlatform.ViewModels
         public ICollection<string> Errors { get; set; }
     }
 }
+

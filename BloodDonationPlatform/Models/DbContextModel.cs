@@ -29,6 +29,8 @@ namespace BloodDonationPlatform.Models
             modelBuilder.Entity<Donation>().Property(z => z.DateOfDonation).IsRequired();
             modelBuilder.Entity<Donation>().Property(z => z.PlaceOfDonation).IsRequired();
             modelBuilder.Entity<Donation>().Property(z => z.QuantityOfBlood).IsRequired();
+
+            modelBuilder.Entity<Donation>().Property(z => z.OriginFileName).IsRequired();
         }
     }
 }

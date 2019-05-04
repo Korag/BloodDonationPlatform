@@ -72,7 +72,7 @@ namespace BloodDonationPlatform.Services
                 {
                     records.Errors.Add("Property " + IndexOfProperty.GetValueOrDefault(ex.ReadingContext.CurrentIndex) + " failed validation. Error was: " + ex.Message);
                     records.Errors.Add("Wrong value of input '" + ex.Text + "'.");
-                    records.Errors.Add("Row number in file " + ex.ReadingContext.Row + 1);
+                    records.Errors.Add("Row number in file " + ex.ReadingContext.Row);
                 }
             }
 

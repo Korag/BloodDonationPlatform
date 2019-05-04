@@ -1,5 +1,6 @@
 ﻿using BloodDonationPlatform.Models;
 using BloodDonationPlatform.ViewModels;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +17,7 @@ namespace BloodDonationPlatform.DAL
             _context.Database.EnsureCreated();
         }
 
-        public void AddDataFromNewCSVFile(ICollection<ReadFromCSVViewModel> records)
+        public void AddDataFromNewCSVFile(ICollection<ReadFromCSVViewModel> records, string NameOfFile)
         {
             foreach (var model in records)
             {
@@ -36,7 +37,9 @@ namespace BloodDonationPlatform.DAL
                     PlaceOfDonation = model.PlaceOfDonation,
                     QuantityOfBlood = model.QuantityOfBlood,
 
-                    DonatorId = donator.DonatorId
+                    DonatorId = donator.DonatorId,
+
+                    OriginFileName = NameOfFile
                 };
 
                 if(IfDonatorExists(donator))
@@ -47,19 +50,33 @@ namespace BloodDonationPlatform.DAL
             }
         }
 
-        private void AddNewDonation(Donation donation)
+        public bool CheckIfNameOfFileIsUnique(string NameOfFile)
+        {
+            var Donations = _context.Donations.Where(z => z.OriginFileName == NameOfFile).ToList();
+
+            if (Donations.Count == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public void AddNewDonation(Donation donation)
         {
             _context.Donations.Add(donation);
             _context.SaveChanges();
         }
 
-        private void AddNewDonator(Donator donator)
+        public void AddNewDonator(Donator donator)
         {
             _context.Donators.Add(donator);
             _context.SaveChanges();
         }
 
-        private bool IfDonatorExists(Donator donator)
+        public bool IfDonatorExists(Donator donator)
         {
             var Donator = _context.Donators.Where(z => z.FirstName == donator.FirstName && z.LastName == donator.LastName
                                     && z.BloodGroup == donator.BloodGroup && z.BloodFactor == donator.BloodFactor).FirstOrDefault();
@@ -73,5 +90,32 @@ namespace BloodDonationPlatform.DAL
                 return true;
             }
         }
+
+        public ICollection<SelectListItem> GetFileNamesAsSelectList()
+        {
+            var FilesNames = GetFileNames();
+            List<SelectListItem> SelectList = new List<SelectListItem>();
+
+            foreach (var fileName in FilesNames)
+            {
+                SelectList.Add
+                    (
+                        new SelectListItem()
+                        {
+                            Text = fileName,
+                            Value = fileName
+                        }
+                    );
+            };
+
+            return SelectList;
+        }
+
+        public ICollection<string> GetFileNames()
+        {
+            var FileNames = _context.Donations.Select(z => z.OriginFileName).Distinct().ToList();
+            return FileNames;
+        }
+
     }
 }

@@ -9,6 +9,8 @@ namespace BloodDonationPlatform.Models
         public string PlaceOfDonation { get; set; }
         public int QuantityOfBlood { get; set; }
 
+        public string OriginFileName { get; set; }
+
         public Guid DonatorId { get; set; }
     }
 }

@@ -15,28 +15,27 @@ namespace BloodDonationPlatform.ViewModels
 
         public ICollection<DonatorViewModel> DonatorsWithDonations { get; set; }
 
-        //[Required(ErrorMessage = "Należy zaznaczyć conajmniej jeden Obszar.")]
+
         public ICollection<string> SelectedFiles { get; set; }
 
-        //[Display(Name = "Obszar")]
         public IList<SelectListItem> AvailableFiles { get; set; }
 
-        //public ICollection<DataChartElement> Top20DonatorsSum { get; set; }
+        
+        public string TotalAmountOfDonatedBlood { get; set; }
 
         public string Top20DonatorsSum { get; set; }
 
-    }
+        public string TotalAmountOfDonatedBloodInSingleFile { get; set; }
 
-    public class DataChartElement
-    {
-        //public DataChartElement(string _category, decimal _value)
-        //{
-        //    this.category = _category;
-        //    this.value = _value;
-        //}
+        public string AverageAmountOfBloodBySingleFile { get; set; }
 
-        public string category { get; set; }
-        public decimal value { get; set; }
+        public string AvgQuantityOfDonatedBloodWithQuantityOfDonationsPerPerson { get; set; }
+
+        public string AvgQuantityOfDonatedBlood { get; set; }
+
+        public string BloodGroupPercentage { get; set; }
+
+        public string BloodFactorPercentage { get; set; }
     }
 
 

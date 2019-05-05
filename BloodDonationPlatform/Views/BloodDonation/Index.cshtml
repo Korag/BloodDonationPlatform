@@ -4,26 +4,27 @@
     ViewData["Title"] = "Index";
 }
 
-<h2>Index</h2>
-
-<h4>VisualizationViewModel</h4>
+<h2>Blood Donation Platform</h2>
 <hr />
+<div class="col-12">
+        <img src="https://cdn-images-1.medium.com/max/1600/1*arNCqidepDKMH8T5B0d6kA.jpeg" style="width:100%; height:30%" />
+ </div>
 <div class="row">
     <div class="col-md-4">
         <form asp-action="ReadCSVFile" enctype="multipart/form-data">
             <div class="form-group" id="inputFormGroup">
                 <label asp-for="CsvFile" class="control-label"></label>
-                <input asp-for="CsvFile" type="file"/>
+                <input asp-for="CsvFile" type="file" />
                 <span asp-validation-for="CsvFile" class="text-danger"></span>
             </div>
             <div class="form-group" id="inputFormGroup">
                 <label asp-for="NameOfFile" class="control-label"></label>
-                <input asp-for="NameOfFile" type="text"/>
+                <input asp-for="NameOfFile" type="text" />
                 <span asp-validation-for="NameOfFile" class="text-danger"></span>
             </div>
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Add new file" class="btn btn-primary" />
             </div>
         </form>
     </div>
@@ -37,22 +38,22 @@
                 @foreach (var availableFile in Model.AvailableFiles)
                 {
                     @*<div id="checkbox-list">*@
-                <label class="btn btn-outline-secondary mr-2
+                    <label class="btn btn-outline-secondary mr-2
                     @if (Model.SelectedFiles.Contains(availableFile.Value))
                     { <text> active </text>} ">
-                    <input type="checkbox"
-                           name="SelectedFiles"
-                           value="@availableFile.Value"
-                           autocomplete="off"
-                           @if (Model.SelectedFiles.Contains(availableFile.Value)) { <text> checked </text> } />
-                    <span>@availableFile.Text</span>
-                </label>
+                        <input type="checkbox"
+                               name="SelectedFiles"
+                               value="@availableFile.Value"
+                               autocomplete="off"
+                               @if (Model.SelectedFiles.Contains(availableFile.Value)) { <text> checked </text> } />
+                        <span>@availableFile.Text</span>
+                    </label>
                 }
             </div>
             @Html.ValidationMessageFor(model => model.SelectedFiles, "", new { @class = "text-danger" })
         </div>
         <div class="form-group">
-            <input type="submit" value="Create" class="btn btn-primary" />
+            <input type="submit" value="Visualize" class="btn btn-primary" />
         </div>
     </form>
 </div>
@@ -62,11 +63,74 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
-<div id="chartdiv"></div>
+<h2>Total amount of donated blood</h2>
+<div id="totalAmountOfDonatedBlood"></div>
 
+<h2>Average quantity of donated blood</h2>
+<div id="avgQuantityOfDonatedBlood"></div>
+
+<h2>Top 20 Donators</h2>
+<div id="topDonators"></div>
+
+<h2>Total amount of donated blood per file</h2>
+<div id="totalAmountInSingleFile"></div>
+
+<h2>Average amount of donated blood per file</h2>
+<div id="averageAmountOfBloodBySingleFile"></div>
+
+<h2>Average amount of donated blood with quantity of donations per person</h2>
+<div id="avgQuantityOfDonatedBloodWithQuantityOfDonationsPerPerson"></div>
+
+<h2>Percentage how many donators have concrete Blood Group</h2>
+<div id="bloodGroupPercentage"></div>
+
+<h2>Percentage how many donators have concrete Blood Factor</h2>
+<div id="bloodFactorPercentage"></div>
 
 <style>
-    #chartdiv {
+    #topDonators {
+        width: 100%;
+        height: 500px;
+    }
+
+    #totalAmountInSingleFile {
+        width: 100%;
+        height: 500px;
+    }
+
+    #totalAmountOfDonatedBlood {
+        width: 80%;
+        height: 500px;
+    }
+
+    #averageAmountOfBloodBySingleFile {
+        width: 100%;
+        height: 500px;
+    }
+
+    #avgQuantityOfDonatedBloodWithQuantityOfDonationsPerPerson {
+        width: 100%;
+        height: 500px;
+    }
+
+    #avgQuantityOfDonatedBlood {
+        width: 60%;
+        height: 500px;
+    }
+
+    #avgQuantityOfDonatedBloodWithQuantityOfDonationsPerPerson {
+        width: 100%;
+        height: 500px;
+    }
+
+
+    #bloodGroupPercentage {
+        width: 100%;
+        height: 500px;
+    }
+
+
+    #bloodFactorPercentage {
         width: 100%;
         height: 500px;
     }
@@ -80,6 +144,7 @@
     <script src="https://www.amcharts.com/lib/4/charts.js"></script>
     <script src="https://www.amcharts.com/lib/4/themes/animated.js"></script>
 
+    @*Top Donators*@
     <script>
         am4core.ready(function () {
 
@@ -88,7 +153,7 @@
             // Themes end
 
             // Create chart instance
-            var chart = am4core.create("chartdiv", am4charts.RadarChart);
+            var chart = am4core.create("topDonators", am4charts.RadarChart);
             chart.scrollbarX = new am4core.Scrollbar();
 
             var data = @Html.Raw(Model.Top20DonatorsSum);
@@ -103,7 +168,7 @@
 
             // Create axes
             var categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
-            categoryAxis.dataFields.category = "category";
+            categoryAxis.dataFields.category = "name";
             categoryAxis.renderer.grid.template.location = 0;
             categoryAxis.renderer.minGridDistance = 30;
             categoryAxis.tooltip.disabled = true;
@@ -123,8 +188,8 @@
             // Create series
             var series = chart.series.push(new am4charts.RadarColumnSeries());
             series.sequencedInterpolation = true;
-            series.dataFields.valueY = "value";
-            series.dataFields.categoryX = "category";
+            series.dataFields.valueY = "steps";
+            series.dataFields.categoryX = "name";
             series.columns.template.strokeWidth = 0;
             series.tooltipText = "{valueY}";
             series.columns.template.radarColumn.cornerRadius = 10;
@@ -146,6 +211,993 @@
             chart.cursor = new am4charts.RadarCursor();
             chart.cursor.innerRadius = am4core.percent(50);
             chart.cursor.lineY.disabled = true;
+
+        }); // end am4core.ready()
+    </script>
+
+    @*Blood donated in every file*@
+    <script>
+        am4core.ready(function () {
+
+            // Themes begin
+            am4core.useTheme(am4themes_animated);
+            // Themes end
+
+            /**
+             * Chart design taken from Samsung health app
+             */
+
+            var chart = am4core.create("totalAmountInSingleFile", am4charts.XYChart);
+            chart.hiddenState.properties.opacity = 0; // this creates initial fade-in
+
+            chart.paddingBottom = 30;
+
+            //chart.data = [{
+            //    "name": "Monica",
+            //    "steps": 45688
+            //}, {
+            //    "name": "Joey",
+            //    "steps": 35781
+            //}, {
+            //    "name": "Ross",
+            //    "steps": 25464
+            //}, {
+            //    "name": "Phoebe",
+            //    "steps": 18788
+            //}, {
+            //    "name": "Rachel",
+            //    "steps": 15465
+            //}, {
+            //    "name": "Chandler",
+            //    "steps": 11561
+            //    }];
+
+            chart.data = @Html.Raw(Model.TotalAmountOfDonatedBloodInSingleFile);
+
+            var categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+            categoryAxis.dataFields.category = "name";
+            categoryAxis.renderer.grid.template.strokeOpacity = 0;
+            categoryAxis.renderer.minGridDistance = 10;
+            categoryAxis.renderer.labels.template.dy = 35;
+            categoryAxis.renderer.tooltip.dy = 35;
+
+            var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+            valueAxis.renderer.inside = true;
+            valueAxis.renderer.labels.template.fillOpacity = 0.3;
+            valueAxis.renderer.grid.template.strokeOpacity = 0;
+            valueAxis.min = 0;
+            valueAxis.cursorTooltipEnabled = false;
+            valueAxis.renderer.baseGrid.strokeOpacity = 0;
+
+            var series = chart.series.push(new am4charts.ColumnSeries);
+            series.dataFields.valueY = "steps";
+            series.dataFields.categoryX = "name";
+            series.tooltipText = "{valueY.value}";
+            series.tooltip.pointerOrientation = "vertical";
+            series.tooltip.dy = - 6;
+            series.columnsContainer.zIndex = 100;
+
+            var columnTemplate = series.columns.template;
+            columnTemplate.width = am4core.percent(50);
+            columnTemplate.maxWidth = 66;
+            columnTemplate.column.cornerRadius(60, 60, 10, 10);
+            columnTemplate.strokeOpacity = 0;
+
+            series.heatRules.push({ target: columnTemplate, property: "fill", dataField: "valueY", min: am4core.color("#ba2323"), max: am4core.color("#FF4646") });
+            series.mainContainer.mask = undefined;
+
+            var cursor = new am4charts.XYCursor();
+            chart.cursor = cursor;
+            cursor.lineX.disabled = true;
+            cursor.lineY.disabled = true;
+            cursor.behavior = "none";
+
+            var bullet = columnTemplate.createChild(am4charts.CircleBullet);
+            bullet.circle.radius = 30;
+            bullet.valign = "bottom";
+            bullet.align = "center";
+            bullet.isMeasured = true;
+            bullet.mouseEnabled = false;
+            bullet.verticalCenter = "bottom";
+            bullet.interactionsEnabled = false;
+
+            var hoverState = bullet.states.create("hover");
+            var outlineCircle = bullet.createChild(am4core.Circle);
+            outlineCircle.adapter.add("radius", function (radius, target) {
+                var circleBullet = target.parent;
+                return circleBullet.circle.pixelRadius + 10;
+            })
+
+            var image = bullet.createChild(am4core.Image);
+            image.width = 60;
+            image.height = 60;
+            image.horizontalCenter = "middle";
+            image.verticalCenter = "middle";
+
+            image.adapter.add("href", function (href, target) {
+                var dataItem = target.dataItem;
+                if (dataItem) {
+                    return "http://pngriver.com/wp-content/uploads/2017/12/download-blood-PNG-transparent-images-transparent-backgrounds-PNGRIVER-COM-blood.png";
+                }
+            })
+
+
+            image.adapter.add("mask", function (mask, target) {
+                var circleBullet = target.parent;
+                return circleBullet.circle;
+            })
+
+            var previousBullet;
+            chart.cursor.events.on("cursorpositionchanged", function (event) {
+                var dataItem = series.tooltipDataItem;
+
+                if (dataItem.column) {
+                    var bullet = dataItem.column.children.getIndex(1);
+
+                    if (previousBullet && previousBullet != bullet) {
+                        previousBullet.isHover = false;
+                    }
+
+                    if (previousBullet != bullet) {
+
+                        var hs = bullet.states.getKey("hover");
+                        hs.properties.dy = -bullet.parent.pixelHeight + 30;
+                        bullet.isHover = true;
+
+                        previousBullet = bullet;
+                    }
+                }
+            })
+
+        }); // end am4core.ready()
+    </script>
+
+    @*TotalAmountOfDonatedBlood*@
+    <script>
+        am4core.ready(function () {
+
+            // Themes begin
+            am4core.useTheme(am4themes_animated);
+            // Themes end
+
+            // Create chart instance
+            var chart = am4core.create("totalAmountOfDonatedBlood", am4charts.XYChart3D);
+
+            // Add data
+            //chart.data = {
+            //    "name": 2005,
+            //    "steps": 23.5
+            //}, {
+            //    "year": 2006,
+            //    "income": 26.2
+            //}, {
+            //    "year": 2007,
+            //    "income": 30.1
+            //}, {
+            //    "year": 2008,
+            //    "income": 29.5
+            //}, {
+            //    "year": 2009,
+            //    "income": 24.6
+            //    }];
+
+            chart.data = @Html.Raw(Model.TotalAmountOfDonatedBlood);
+
+            // Create axes
+            var categoryAxis = chart.yAxes.push(new am4charts.CategoryAxis());
+            categoryAxis.dataFields.category = "name";
+            categoryAxis.numberFormatter.numberFormat = "#";
+            categoryAxis.renderer.inversed = true;
+
+            var valueAxis = chart.xAxes.push(new am4charts.ValueAxis());
+
+            // Create series
+            var series = chart.series.push(new am4charts.ColumnSeries3D());
+            series.dataFields.valueX = "steps";
+            series.dataFields.categoryY = "name";
+            series.name = "Steps";
+            series.columns.template.propertyFields.fill = "color";
+            series.columns.template.tooltipText = "{valueX}";
+            series.columns.template.column3D.stroke = am4core.color("#fff");
+            series.columns.template.column3D.strokeOpacity = 0.2;
+
+        }); // end am4core.ready()
+    </script>
+
+    @*AvgQuantityOfDonatedBlood*@
+    <script>
+        am4core.ready(function () {
+
+            // Themes begin
+            am4core.useTheme(am4themes_animated);
+            // Themes end
+
+            // Create chart instance
+            var chart = am4core.create("avgQuantityOfDonatedBlood", am4charts.XYChart3D);
+
+            // Add data
+            //chart.data = {
+            //    "name": 2005,
+            //    "steps": 23.5
+            //}, {
+            //    "year": 2006,
+            //    "income": 26.2
+            //}, {
+            //    "year": 2007,
+            //    "income": 30.1
+            //}, {
+            //    "year": 2008,
+            //    "income": 29.5
+            //}, {
+            //    "year": 2009,
+            //    "income": 24.6
+            //    }];
+
+            chart.data = @Html.Raw(Model.AvgQuantityOfDonatedBlood);
+
+            // Create axes
+            var categoryAxis = chart.yAxes.push(new am4charts.CategoryAxis());
+            categoryAxis.dataFields.category = "name";
+            categoryAxis.numberFormatter.numberFormat = "#";
+            categoryAxis.renderer.inversed = true;
+
+            var valueAxis = chart.xAxes.push(new am4charts.ValueAxis());
+
+            // Create series
+            var series = chart.series.push(new am4charts.ColumnSeries3D());
+            series.dataFields.valueX = "steps";
+            series.dataFields.categoryY = "name";
+            series.name = "Steps";
+            series.columns.template.propertyFields.fill = "color";
+            series.columns.template.tooltipText = "{valueX}";
+            series.columns.template.column3D.stroke = am4core.color("#fff");
+            series.columns.template.column3D.strokeOpacity = 0.2;
+
+        }); // end am4core.ready()
+    </script>
+
+
+    @*AverageAmountOfBloodBySingleFile*@
+    <script>
+        am4core.ready(function () {
+
+            // Themes begin
+            am4core.useTheme(am4themes_animated);
+            // Themes end
+
+            // Create chart instance
+            var chart = am4core.create("averageAmountOfBloodBySingleFile", am4charts.XYChart);
+            chart.scrollbarX = new am4core.Scrollbar();
+
+            // Add data
+            //chart.data = [{
+            //    "country": "USA",
+            //    "visits": 3025
+            //}, {
+            //    "country": "China",
+            //    "visits": 1882
+            //}, {
+            //    "country": "Japan",
+            //    "visits": 1809
+            //}, {
+            //    "country": "Germany",
+            //    "visits": 1322
+            //}, {
+            //    "country": "UK",
+            //    "visits": 1122
+            //}, {
+            //    "country": "France",
+            //    "visits": 1114
+            //}, {
+            //    "country": "India",
+            //    "visits": 984
+            //}, {
+            //    "country": "Spain",
+            //    "visits": 711
+            //}, {
+            //    "country": "Netherlands",
+            //    "visits": 665
+            //}];
+
+            chart.data = @Html.Raw(Model.AverageAmountOfBloodBySingleFile);
+
+            prepareParetoData();
+
+            function prepareParetoData() {
+                var total = 0;
+
+                for (var i = 0; i < chart.data.length; i++) {
+                    var value = chart.data[i].steps;
+                    total += value;
+                }
+
+                var sum = 0;
+                for (var i = 0; i < chart.data.length; i++) {
+                    var value = chart.data[i].steps;
+                    sum += value;
+                    chart.data[i].pareto = sum / total * 100;
+                }
+            }
+
+            // Create axes
+            var categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+            categoryAxis.dataFields.category = "name";
+            categoryAxis.renderer.grid.template.location = 0;
+            categoryAxis.renderer.minGridDistance = 60;
+            categoryAxis.tooltip.disabled = true;
+
+            var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+            valueAxis.renderer.minWidth = 50;
+            valueAxis.min = 0;
+            valueAxis.cursorTooltipEnabled = false;
+
+            // Create series
+            var series = chart.series.push(new am4charts.ColumnSeries());
+            series.sequencedInterpolation = true;
+            series.dataFields.valueY = "steps";
+            series.dataFields.categoryX = "name";
+            series.tooltipText = "[{categoryX}: bold]{valueY}[/]";
+            series.columns.template.strokeWidth = 0;
+
+            series.tooltip.pointerOrientation = "vertical";
+
+            series.columns.template.column.cornerRadiusTopLeft = 10;
+            series.columns.template.column.cornerRadiusTopRight = 10;
+            series.columns.template.column.fillOpacity = 0.8;
+
+            // on hover, make corner radiuses bigger
+            var hoverState = series.columns.template.column.states.create("hover");
+            hoverState.properties.cornerRadiusTopLeft = 0;
+            hoverState.properties.cornerRadiusTopRight = 0;
+            hoverState.properties.fillOpacity = 1;
+
+            series.columns.template.adapter.add("fill", (fill, target) => {
+                return chart.colors.getIndex(target.dataItem.index);
+            })
+
+
+            var paretoValueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+            paretoValueAxis.renderer.opposite = true;
+            paretoValueAxis.min = 0;
+            paretoValueAxis.max = 100;
+            paretoValueAxis.strictMinMax = true;
+            paretoValueAxis.renderer.grid.template.disabled = true;
+            paretoValueAxis.numberFormatter = new am4core.NumberFormatter();
+            paretoValueAxis.numberFormatter.numberFormat = "#'%'"
+            paretoValueAxis.cursorTooltipEnabled = false;
+
+            var paretoSeries = chart.series.push(new am4charts.LineSeries())
+            paretoSeries.dataFields.valueY = "pareto";
+            paretoSeries.dataFields.categoryX = "name";
+            paretoSeries.yAxis = paretoValueAxis;
+            paretoSeries.tooltipText = "pareto: {valueY.formatNumber('#.0')}%[/]";
+            paretoSeries.bullets.push(new am4charts.CircleBullet());
+            paretoSeries.strokeWidth = 2;
+            paretoSeries.stroke = new am4core.InterfaceColorSet().getFor("alternativeBackground");
+            paretoSeries.strokeOpacity = 0.5;
+
+            // Cursor
+            chart.cursor = new am4charts.XYCursor();
+            chart.cursor.behavior = "panX";
+
+        }); // end am4core.ready()
+    </script>
+
+    @*AvgQuantityOfDonatedBloodWithQuantityOfDonationsPerPerson*@
+    <script>
+        am4core.ready(function () {
+
+            // Themes begin
+            am4core.useTheme(am4themes_animated);
+            // Themes end
+
+            var chart = am4core.create("avgQuantityOfDonatedBloodWithQuantityOfDonationsPerPerson", am4charts.XYChart);
+
+            var valueAxisX = chart.xAxes.push(new am4charts.ValueAxis());
+            valueAxisX.renderer.ticks.template.disabled = true;
+            valueAxisX.renderer.axisFills.template.disabled = true;
+
+            var valueAxisY = chart.yAxes.push(new am4charts.ValueAxis());
+            valueAxisY.renderer.ticks.template.disabled = true;
+            valueAxisY.renderer.axisFills.template.disabled = true;
+
+            var series = chart.series.push(new am4charts.LineSeries());
+            series.dataFields.valueX = "steps2";
+            series.dataFields.valueY = "steps";
+            series.dataFields.value = "name";
+            series.strokeOpacity = 0;
+            series.sequencedInterpolation = true;
+            series.tooltip.pointerOrientation = "vertical";
+
+            var bullet = series.bullets.push(new am4core.Circle());
+            bullet.fill = am4core.color("#ff0000");
+            bullet.propertyFields.fill = "color";
+            bullet.strokeOpacity = 0;
+            bullet.strokeWidth = 2;
+            bullet.fillOpacity = 0.5;
+            bullet.stroke = am4core.color("#ffffff");
+            bullet.hiddenState.properties.opacity = 0;
+            bullet.tooltipText = "[bold]{title}Person: {name}\n";
+
+            var outline = chart.plotContainer.createChild(am4core.Circle);
+            outline.fillOpacity = 0;
+            outline.strokeOpacity = 0.8;
+            outline.stroke = am4core.color("#ff0000");
+            outline.strokeWidth = 2;
+            outline.hide(0);
+
+            var blurFilter = new am4core.BlurFilter();
+            outline.filters.push(blurFilter);
+
+            bullet.events.on("over", function (event) {
+                var target = event.target;
+                chart.cursor.triggerMove({ x: target.pixelX, y: target.pixelY }, "hard");
+                chart.cursor.lineX.y = target.pixelY;
+                chart.cursor.lineY.x = target.pixelX - chart.plotContainer.pixelWidth;
+                valueAxisX.tooltip.disabled = false;
+                valueAxisY.tooltip.disabled = false;
+
+                outline.radius = target.pixelRadius + 2;
+                outline.x = target.pixelX;
+                outline.y = target.pixelY;
+                outline.show();
+            })
+
+            bullet.events.on("out", function (event) {
+                chart.cursor.triggerMove(event.pointer.point, "none");
+                chart.cursor.lineX.y = 0;
+                chart.cursor.lineY.x = 0;
+                valueAxisX.tooltip.disabled = true;
+                valueAxisY.tooltip.disabled = true;
+                outline.hide();
+            })
+
+            var hoverState = bullet.states.create("hover");
+            hoverState.properties.fillOpacity = 1;
+            hoverState.properties.strokeOpacity = 1;
+
+            series.heatRules.push({ target: bullet, min: 2, max: 60, property: "radius" });
+
+            bullet.adapter.add("tooltipY", function (tooltipY, target) {
+                return -target.radius;
+            })
+
+            chart.cursor = new am4charts.XYCursor();
+            chart.cursor.behavior = "zoomXY";
+
+            chart.scrollbarX = new am4core.Scrollbar();
+            chart.scrollbarY = new am4core.Scrollbar();
+
+            //chart.data = [
+            //    {
+            //        "title": "Afghanistan",
+            //        "id": "AF",
+            //        "color": "#eea638",
+            //        "continent": "asia",
+            //        "x": 1349.69694102398,
+            //        "y": 60.524,
+            //        "value": 33397058
+            //    },
+            //    {
+            //        "title": "Albania",
+            //        "id": "AL",
+            //        "color": "#d8854f",
+            //        "continent": "europe",
+            //        "x": 6969.30628256456,
+            //        "y": 77.185,
+            //        "value": 3227373
+            //    }];
+
+            chart.data = @Html.Raw(Model.AvgQuantityOfDonatedBloodWithQuantityOfDonationsPerPerson);
+
+        }); // end am4core.ready()
+    </script>
+
+    @*BloodGroup*@
+    <script>
+        am4core.ready(function () {
+
+            // Themes begin
+            am4core.useTheme(am4themes_animated);
+            // Themes end
+
+            var data = [{
+                "name": "Dummy",
+                "disabled": true,
+                "steps": 1000,
+                "color": am4core.color("#dadada"),
+                "opacity": 0.3,
+                "strokeDasharray": "4,4"
+            }];
+            //    "country": "Lithuania",
+            //    "litres": 501.9
+            //}, {
+            //    "country": "Estonia",
+            //    "litres": 301.9
+            //}, {
+            //    "country": "Ireland",
+            //    "litres": 201.1
+            //}, {
+            //    "country": "Germany",
+            //    "litres": 165.8
+            //}, {
+            //    "country": "Australia",
+            //    "litres": 139.9
+            //}, {
+            //    "country": "Austria",
+            //    "litres": 128.3
+            //}];
+
+            data = data.concat(@Html.Raw(Model.BloodGroupPercentage));
+
+
+            // cointainer to hold both charts
+            var container = am4core.create("bloodGroupPercentage", am4core.Container);
+            container.width = am4core.percent(100);
+            container.height = am4core.percent(100);
+            container.layout = "horizontal";
+
+            container.events.on("maxsizechanged", function () {
+                chart1.zIndex = 0;
+                separatorLine.zIndex = 1;
+                dragText.zIndex = 2;
+                chart2.zIndex = 3;
+            })
+
+            var chart1 = container.createChild(am4charts.PieChart);
+            chart1.fontSize = 11;
+            chart1.hiddenState.properties.opacity = 0; // this makes initial fade in effect
+            chart1.data = data;
+            chart1.radius = am4core.percent(70);
+            chart1.innerRadius = am4core.percent(40);
+            chart1.zIndex = 1;
+
+            var series1 = chart1.series.push(new am4charts.PieSeries());
+            series1.dataFields.value = "steps";
+            series1.dataFields.category = "name";
+            series1.colors.step = 2;
+            series1.alignLabels = false;
+            series1.labels.template.bent = true;
+            series1.labels.template.radius = 3;
+            series1.labels.template.padding(0, 0, 0, 0);
+
+            var sliceTemplate1 = series1.slices.template;
+            sliceTemplate1.cornerRadius = 5;
+            sliceTemplate1.draggable = true;
+            sliceTemplate1.inert = true;
+            sliceTemplate1.propertyFields.fill = "color";
+            sliceTemplate1.propertyFields.fillOpacity = "opacity";
+            sliceTemplate1.propertyFields.stroke = "color";
+            sliceTemplate1.propertyFields.strokeDasharray = "strokeDasharray";
+            sliceTemplate1.strokeWidth = 1;
+            sliceTemplate1.strokeOpacity = 1;
+
+            var zIndex = 5;
+
+            sliceTemplate1.events.on("down", function (event) {
+                event.target.toFront();
+                // also put chart to front
+                var series = event.target.dataItem.component;
+                series.chart.zIndex = zIndex++;
+            })
+
+            series1.ticks.template.disabled = true;
+
+            sliceTemplate1.states.getKey("active").properties.shiftRadius = 0;
+
+            sliceTemplate1.events.on("dragstop", function (event) {
+                handleDragStop(event);
+            })
+
+            // separator line and text
+            var separatorLine = container.createChild(am4core.Line);
+            separatorLine.x1 = 0;
+            separatorLine.y2 = 300;
+            separatorLine.strokeWidth = 3;
+            separatorLine.stroke = am4core.color("#dadada");
+            separatorLine.valign = "middle";
+            separatorLine.strokeDasharray = "5,5";
+
+
+            var dragText = container.createChild(am4core.Label);
+            dragText.text = "Drag slices over the line";
+            dragText.rotation = 90;
+            dragText.valign = "middle";
+            dragText.align = "center";
+            dragText.paddingBottom = 5;
+
+            // second chart
+            var chart2 = container.createChild(am4charts.PieChart);
+            chart2.hiddenState.properties.opacity = 0; // this makes initial fade in effect
+            chart2.fontSize = 11;
+            chart2.radius = am4core.percent(70);
+            chart2.data = data;
+            chart2.innerRadius = am4core.percent(40);
+            chart2.zIndex = 1;
+
+            var series2 = chart2.series.push(new am4charts.PieSeries());
+            series2.dataFields.value = "steps";
+            series2.dataFields.category = "name";
+            series2.colors.step = 2;
+
+            series2.alignLabels = false;
+            series2.labels.template.bent = true;
+            series2.labels.template.radius = 3;
+            series2.labels.template.padding(0, 0, 0, 0);
+            series2.labels.template.propertyFields.disabled = "disabled";
+
+            var sliceTemplate2 = series2.slices.template;
+            sliceTemplate2.copyFrom(sliceTemplate1);
+
+            series2.ticks.template.disabled = true;
+
+            function handleDragStop(event) {
+                var targetSlice = event.target;
+                var dataItem1;
+                var dataItem2;
+                var slice1;
+                var slice2;
+
+                if (series1.slices.indexOf(targetSlice) != -1) {
+                    slice1 = targetSlice;
+                    slice2 = series2.dataItems.getIndex(targetSlice.dataItem.index).slice;
+                }
+                else if (series2.slices.indexOf(targetSlice) != -1) {
+                    slice1 = series1.dataItems.getIndex(targetSlice.dataItem.index).slice;
+                    slice2 = targetSlice;
+                }
+
+
+                dataItem1 = slice1.dataItem;
+                dataItem2 = slice2.dataItem;
+
+                var series1Center = am4core.utils.spritePointToSvg({ x: 0, y: 0 }, series1.slicesContainer);
+                var series2Center = am4core.utils.spritePointToSvg({ x: 0, y: 0 }, series2.slicesContainer);
+
+                var series1CenterConverted = am4core.utils.svgPointToSprite(series1Center, series2.slicesContainer);
+                var series2CenterConverted = am4core.utils.svgPointToSprite(series2Center, series1.slicesContainer);
+
+                // tooltipY and tooltipY are in the middle of the slice, so we use them to avoid extra calculations
+                var targetSlicePoint = am4core.utils.spritePointToSvg({ x: targetSlice.tooltipX, y: targetSlice.tooltipY }, targetSlice);
+
+                if (targetSlice == slice1) {
+                    if (targetSlicePoint.x > container.pixelWidth / 2) {
+                        var value = dataItem1.value;
+
+                        dataItem1.hide();
+
+                        var animation = slice1.animate([{ property: "x", to: series2CenterConverted.x }, { property: "y", to: series2CenterConverted.y }], 400);
+                        animation.events.on("animationprogress", function (event) {
+                            slice1.hideTooltip();
+                        })
+
+                        slice2.x = 0;
+                        slice2.y = 0;
+
+                        dataItem2.show();
+                    }
+                    else {
+                        slice1.animate([{ property: "x", to: 0 }, { property: "y", to: 0 }], 400);
+                    }
+                }
+                if (targetSlice == slice2) {
+                    if (targetSlicePoint.x < container.pixelWidth / 2) {
+
+                        var value = dataItem2.value;
+
+                        dataItem2.hide();
+
+                        var animation = slice2.animate([{ property: "x", to: series1CenterConverted.x }, { property: "y", to: series1CenterConverted.y }], 400);
+                        animation.events.on("animationprogress", function (event) {
+                            slice2.hideTooltip();
+                        })
+
+                        slice1.x = 0;
+                        slice1.y = 0;
+                        dataItem1.show();
+                    }
+                    else {
+                        slice2.animate([{ property: "x", to: 0 }, { property: "y", to: 0 }], 400);
+                    }
+                }
+
+                toggleDummySlice(series1);
+                toggleDummySlice(series2);
+
+                series1.hideTooltip();
+                series2.hideTooltip();
+            }
+
+            function toggleDummySlice(series) {
+                var show = true;
+                for (var i = 1; i < series.dataItems.length; i++) {
+                    var dataItem = series.dataItems.getIndex(i);
+                    if (dataItem.slice.visible && !dataItem.slice.isHiding) {
+                        show = false;
+                    }
+                }
+
+                var dummySlice = series.dataItems.getIndex(0);
+                if (show) {
+                    dummySlice.show();
+                }
+                else {
+                    dummySlice.hide();
+                }
+            }
+
+            series2.events.on("datavalidated", function () {
+
+                var dummyDataItem = series2.dataItems.getIndex(0);
+                dummyDataItem.show(0);
+                dummyDataItem.slice.draggable = false;
+                dummyDataItem.slice.tooltipText = undefined;
+
+                for (var i = 1; i < series2.dataItems.length; i++) {
+                    series2.dataItems.getIndex(i).hide(0);
+                }
+            })
+
+            series1.events.on("datavalidated", function () {
+                var dummyDataItem = series1.dataItems.getIndex(0);
+                dummyDataItem.hide(0);
+                dummyDataItem.slice.draggable = false;
+                dummyDataItem.slice.tooltipText = undefined;
+            })
+
+        }); // end am4core.ready()
+    </script>
+
+    @*BloodFactor*@
+    <script>
+        am4core.ready(function () {
+
+            // Themes begin
+            am4core.useTheme(am4themes_animated);
+            // Themes end
+
+            var data = [{
+                "name": "Dummy",
+                "disabled": true,
+                "steps": 1000,
+                "color": am4core.color("#dadada"),
+                "opacity": 0.3,
+                "strokeDasharray": "4,4"
+            }];
+            //    "country": "Lithuania",
+            //    "litres": 501.9
+            //}, {
+            //    "country": "Estonia",
+            //    "litres": 301.9
+            //}, {
+            //    "country": "Ireland",
+            //    "litres": 201.1
+            //}, {
+            //    "country": "Germany",
+            //    "litres": 165.8
+            //}, {
+            //    "country": "Australia",
+            //    "litres": 139.9
+            //}, {
+            //    "country": "Austria",
+            //    "litres": 128.3
+            //}];
+
+            data = data.concat(@Html.Raw(Model.BloodFactorPercentage));
+
+            // cointainer to hold both charts
+            var container = am4core.create("bloodFactorPercentage", am4core.Container);
+            container.width = am4core.percent(100);
+            container.height = am4core.percent(100);
+            container.layout = "horizontal";
+
+            container.events.on("maxsizechanged", function () {
+                chart1.zIndex = 0;
+                separatorLine.zIndex = 1;
+                dragText.zIndex = 2;
+                chart2.zIndex = 3;
+            })
+
+            var chart1 = container.createChild(am4charts.PieChart);
+            chart1.fontSize = 11;
+            chart1.hiddenState.properties.opacity = 0; // this makes initial fade in effect
+            chart1.data = data;
+            chart1.radius = am4core.percent(70);
+            chart1.innerRadius = am4core.percent(40);
+            chart1.zIndex = 1;
+
+            var series1 = chart1.series.push(new am4charts.PieSeries());
+            series1.dataFields.value = "steps";
+            series1.dataFields.category = "name";
+            series1.colors.step = 2;
+            series1.alignLabels = false;
+            series1.labels.template.bent = true;
+            series1.labels.template.radius = 3;
+            series1.labels.template.padding(0, 0, 0, 0);
+
+            var sliceTemplate1 = series1.slices.template;
+            sliceTemplate1.cornerRadius = 5;
+            sliceTemplate1.draggable = true;
+            sliceTemplate1.inert = true;
+            sliceTemplate1.propertyFields.fill = "color";
+            sliceTemplate1.propertyFields.fillOpacity = "opacity";
+            sliceTemplate1.propertyFields.stroke = "color";
+            sliceTemplate1.propertyFields.strokeDasharray = "strokeDasharray";
+            sliceTemplate1.strokeWidth = 1;
+            sliceTemplate1.strokeOpacity = 1;
+
+            var zIndex = 5;
+
+            sliceTemplate1.events.on("down", function (event) {
+                event.target.toFront();
+                // also put chart to front
+                var series = event.target.dataItem.component;
+                series.chart.zIndex = zIndex++;
+            })
+
+            series1.ticks.template.disabled = true;
+
+            sliceTemplate1.states.getKey("active").properties.shiftRadius = 0;
+
+            sliceTemplate1.events.on("dragstop", function (event) {
+                handleDragStop(event);
+            })
+
+            // separator line and text
+            var separatorLine = container.createChild(am4core.Line);
+            separatorLine.x1 = 0;
+            separatorLine.y2 = 300;
+            separatorLine.strokeWidth = 3;
+            separatorLine.stroke = am4core.color("#dadada");
+            separatorLine.valign = "middle";
+            separatorLine.strokeDasharray = "5,5";
+
+
+            var dragText = container.createChild(am4core.Label);
+            dragText.text = "Drag slices over the line";
+            dragText.rotation = 90;
+            dragText.valign = "middle";
+            dragText.align = "center";
+            dragText.paddingBottom = 5;
+
+            // second chart
+            var chart2 = container.createChild(am4charts.PieChart);
+            chart2.hiddenState.properties.opacity = 0; // this makes initial fade in effect
+            chart2.fontSize = 11;
+            chart2.radius = am4core.percent(70);
+            chart2.data = data;
+            chart2.innerRadius = am4core.percent(40);
+            chart2.zIndex = 1;
+
+            var series2 = chart2.series.push(new am4charts.PieSeries());
+            series2.dataFields.value = "steps";
+            series2.dataFields.category = "name";
+            series2.colors.step = 2;
+
+            series2.alignLabels = false;
+            series2.labels.template.bent = true;
+            series2.labels.template.radius = 3;
+            series2.labels.template.padding(0, 0, 0, 0);
+            series2.labels.template.propertyFields.disabled = "disabled";
+
+            var sliceTemplate2 = series2.slices.template;
+            sliceTemplate2.copyFrom(sliceTemplate1);
+
+            series2.ticks.template.disabled = true;
+
+            function handleDragStop(event) {
+                var targetSlice = event.target;
+                var dataItem1;
+                var dataItem2;
+                var slice1;
+                var slice2;
+
+                if (series1.slices.indexOf(targetSlice) != -1) {
+                    slice1 = targetSlice;
+                    slice2 = series2.dataItems.getIndex(targetSlice.dataItem.index).slice;
+                }
+                else if (series2.slices.indexOf(targetSlice) != -1) {
+                    slice1 = series1.dataItems.getIndex(targetSlice.dataItem.index).slice;
+                    slice2 = targetSlice;
+                }
+
+
+                dataItem1 = slice1.dataItem;
+                dataItem2 = slice2.dataItem;
+
+                var series1Center = am4core.utils.spritePointToSvg({ x: 0, y: 0 }, series1.slicesContainer);
+                var series2Center = am4core.utils.spritePointToSvg({ x: 0, y: 0 }, series2.slicesContainer);
+
+                var series1CenterConverted = am4core.utils.svgPointToSprite(series1Center, series2.slicesContainer);
+                var series2CenterConverted = am4core.utils.svgPointToSprite(series2Center, series1.slicesContainer);
+
+                // tooltipY and tooltipY are in the middle of the slice, so we use them to avoid extra calculations
+                var targetSlicePoint = am4core.utils.spritePointToSvg({ x: targetSlice.tooltipX, y: targetSlice.tooltipY }, targetSlice);
+
+                if (targetSlice == slice1) {
+                    if (targetSlicePoint.x > container.pixelWidth / 2) {
+                        var value = dataItem1.value;
+
+                        dataItem1.hide();
+
+                        var animation = slice1.animate([{ property: "x", to: series2CenterConverted.x }, { property: "y", to: series2CenterConverted.y }], 400);
+                        animation.events.on("animationprogress", function (event) {
+                            slice1.hideTooltip();
+                        })
+
+                        slice2.x = 0;
+                        slice2.y = 0;
+
+                        dataItem2.show();
+                    }
+                    else {
+                        slice1.animate([{ property: "x", to: 0 }, { property: "y", to: 0 }], 400);
+                    }
+                }
+                if (targetSlice == slice2) {
+                    if (targetSlicePoint.x < container.pixelWidth / 2) {
+
+                        var value = dataItem2.value;
+
+                        dataItem2.hide();
+
+                        var animation = slice2.animate([{ property: "x", to: series1CenterConverted.x }, { property: "y", to: series1CenterConverted.y }], 400);
+                        animation.events.on("animationprogress", function (event) {
+                            slice2.hideTooltip();
+                        })
+
+                        slice1.x = 0;
+                        slice1.y = 0;
+                        dataItem1.show();
+                    }
+                    else {
+                        slice2.animate([{ property: "x", to: 0 }, { property: "y", to: 0 }], 400);
+                    }
+                }
+
+                toggleDummySlice(series1);
+                toggleDummySlice(series2);
+
+                series1.hideTooltip();
+                series2.hideTooltip();
+            }
+
+            function toggleDummySlice(series) {
+                var show = true;
+                for (var i = 1; i < series.dataItems.length; i++) {
+                    var dataItem = series.dataItems.getIndex(i);
+                    if (dataItem.slice.visible && !dataItem.slice.isHiding) {
+                        show = false;
+                    }
+                }
+
+                var dummySlice = series.dataItems.getIndex(0);
+                if (show) {
+                    dummySlice.show();
+                }
+                else {
+                    dummySlice.hide();
+                }
+            }
+
+            series2.events.on("datavalidated", function () {
+
+                var dummyDataItem = series2.dataItems.getIndex(0);
+                dummyDataItem.show(0);
+                dummyDataItem.slice.draggable = false;
+                dummyDataItem.slice.tooltipText = undefined;
+
+                for (var i = 1; i < series2.dataItems.length; i++) {
+                    series2.dataItems.getIndex(i).hide(0);
+                }
+            })
+
+            series1.events.on("datavalidated", function () {
+                var dummyDataItem = series1.dataItems.getIndex(0);
+                dummyDataItem.hide(0);
+                dummyDataItem.slice.draggable = false;
+                dummyDataItem.slice.tooltipText = undefined;
+            })
 
         }); // end am4core.ready()
     </script>

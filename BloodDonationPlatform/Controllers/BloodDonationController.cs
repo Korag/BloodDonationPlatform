@@ -33,35 +33,77 @@ namespace BloodDonationPlatform.Controllers
 
         public IActionResult Index(VisualizationViewModel visualizationModel)
         {
+            visualizationModel.AvailableFiles = new List<SelectListItem>();
+            visualizationModel.AvailableFiles = _context.GetFileNamesAsSelectList().ToList();
+
             if (visualizationModel.SelectedFiles == null)
             {
-                visualizationModel.SelectedFiles = new List<String>();
+                visualizationModel.SelectedFiles = visualizationModel.AvailableFiles.Select(z=> z.Text).ToList();
             }
 
             visualizationModel.DonatorsWithDonations = _context.GetDonatorsWithDonations(visualizationModel.SelectedFiles);
 
-            visualizationModel.AvailableFiles = new List<SelectListItem>();
-            visualizationModel.AvailableFiles = _context.GetFileNamesAsSelectList().ToList();
+            // łączna ilość zebranej krwi przez wszystkich donatorów 
+            var amountOfBlood = visualizationModel.DonatorsWithDonations.Sum(z => z.Donations.Sum(s => s.QuantityOfBlood));
+            List<NameValueViewModel> TotalAmountOfDonatedBlood = new List<NameValueViewModel> { new NameValueViewModel { name = "Total Donated Blood \n (l)", steps = amountOfBlood/1000 } };
 
-            // łączna ilość zebranej krwi przez wszystkich donatorów
-            var TotalAmountOfBlood = visualizationModel.DonatorsWithDonations.Sum(z => z.Donations.Sum(s => s.QuantityOfBlood));
 
             // łączna zebrana ilość krwi w każdym z plików
+            var TotalAmountOfBloodBySingleFile = new List<NameValueViewModel>();
 
-            // średnia oddawanej ilości krwi w każdym z plików
+            foreach (var file in visualizationModel.SelectedFiles)
+            {
+                var PartialSum = visualizationModel.DonatorsWithDonations.Select(z => z.Donations.Where(d => d.OriginFileName == file).Sum(c => c.QuantityOfBlood)).Sum();
 
-            // liczba donacji na osobę
+                NameValueViewModel AmountOfBloodInSingleFile = new NameValueViewModel { name = file, steps = PartialSum };
+                TotalAmountOfBloodBySingleFile.Add(AmountOfBloodInSingleFile);
+            }
 
-            // średnia ilość oddanej krwi na osobę
+            // średnia oddawana ilość krwi w każdym z plików na 1 donację
+            var AverageAmountOfBloodBySingleFile = new List<NameValueViewModel>();
 
-            // responsywność wykresów
+            foreach (var file in visualizationModel.SelectedFiles)
+            {
+                var AmountOfDonations= visualizationModel.DonatorsWithDonations.Select(z => z.Donations.Where(d => d.OriginFileName == file)).Count();
 
-            // PANEL SZCZEGÓŁÓW POJEDYNCZEGO DONATORA -> COMPONENT
+                NameValueViewModel AverageAmountOfBloodInSingleFile = new NameValueViewModel { name = file, steps = (TotalAmountOfBloodBySingleFile.Where(z=> z.name == file).Select(z=>z.steps).FirstOrDefault()/AmountOfDonations) };
+                AverageAmountOfBloodBySingleFile.Add(AverageAmountOfBloodInSingleFile);
+            }
+
+            //// liczba donacji na osobę
+            //var QuantityOfDonationsPerPerson = visualizationModel.DonatorsWithDonations.Select(z => new { Person = z.FirstName + " " + z.LastName, Value = z.Donations.Count }).ToList();
+
+            //// średnia ilość oddanej krwi każdej osoby 
+            //var AvgQuantityOfDonatedBloodPerPerson = visualizationModel.DonatorsWithDonations.Select(z => new NameValueViewModel { name = z.FirstName + " " + z.LastName, steps = z.Donations.Sum(c => c.QuantityOfBlood)/z.Donations.Select(s=> s.DonatorId).Count() }).ToList();
+
+            // liczba donacji na osobę połączona ze średnią ilością oddanej krwi danej osoby
+            var AvgQuantityOfDonatedBloodWithQuantityOfDonationsPerPerson = visualizationModel.DonatorsWithDonations.Select(z => new NameValueValueViewModel { name = z.FirstName + " " + z.LastName, steps = z.Donations.Sum(c => c.QuantityOfBlood) / z.Donations.Select(s => s.DonatorId).Count(), steps2 = z.Donations.Count }).ToList();
+
+            // średnia ilość oddanej krwi
+            var avgQuantityOfDonatedBlood = visualizationModel.DonatorsWithDonations.Select(z => new { Person = z.FirstName + " " + z.LastName, z.Donations.Count, Value = z.Donations.Sum(c=> c.QuantityOfBlood) }).Select(z=> z.Value/z.Count).Average();
+            List<NameValueViewModel> AvgQuantityOfDonatedBlood = new List<NameValueViewModel> { new NameValueViewModel { name = "Average Quantity Of Donated Blood \n (ml)", steps = (int)(avgQuantityOfDonatedBlood) } };
 
             // 20 osób które oddały najwięcej krwi
-            var tmp = visualizationModel.DonatorsWithDonations.Select(z => new DataChartElement { category = z.FirstName[0] + ". " + z.LastName, value = z.Donations.Sum(s => s.QuantityOfBlood) }).OrderByDescending(z=> z.value).Take(20).ToList();
+            var Top20Donators = visualizationModel.DonatorsWithDonations.Select(z => new NameValueViewModel { name = z.FirstName[0] + ". " + z.LastName, steps = z.Donations.Sum(s => s.QuantityOfBlood) }).OrderByDescending(z=> z.steps).Take(20).ToList();
 
-            visualizationModel.Top20DonatorsSum =  JsonConvert.SerializeObject(tmp);
+            // procent ludzi z daną grupą krwi 
+            var BloodGroupPercentage = visualizationModel.DonatorsWithDonations.GroupBy(z => z.BloodGroup).Select(z => new NameValueViewModel { name = z.Key, steps = z.Count()}).ToList();
+
+            // procent ludzi z danym czynnikiem krwi
+            var BloodFactorPercentage = visualizationModel.DonatorsWithDonations.GroupBy(z => z.BloodFactor).Select(z => new NameValueViewModel { name = z.Key, steps = z.Count()}).ToList();
+
+            visualizationModel.TotalAmountOfDonatedBlood = JsonConvert.SerializeObject(TotalAmountOfDonatedBlood);
+            visualizationModel.Top20DonatorsSum =  JsonConvert.SerializeObject(Top20Donators);
+            visualizationModel.TotalAmountOfDonatedBloodInSingleFile = JsonConvert.SerializeObject(TotalAmountOfBloodBySingleFile);
+
+            visualizationModel.AverageAmountOfBloodBySingleFile = JsonConvert.SerializeObject(AverageAmountOfBloodBySingleFile);
+            visualizationModel.AvgQuantityOfDonatedBloodWithQuantityOfDonationsPerPerson = JsonConvert.SerializeObject(AvgQuantityOfDonatedBloodWithQuantityOfDonationsPerPerson);
+            visualizationModel.AvgQuantityOfDonatedBlood = JsonConvert.SerializeObject(AvgQuantityOfDonatedBlood);
+
+            visualizationModel.BloodGroupPercentage = JsonConvert.SerializeObject(BloodGroupPercentage);
+            visualizationModel.BloodFactorPercentage = JsonConvert.SerializeObject(BloodFactorPercentage);
+
+            // PANEL SZCZEGÓŁÓW POJEDYNCZEGO DONATORA -> COMPONENT
 
             return View(visualizationModel);
         }

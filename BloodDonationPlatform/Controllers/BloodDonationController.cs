@@ -31,7 +31,7 @@ namespace BloodDonationPlatform.Controllers
             _csvReader = new CsvService();
         }
 
-        public IActionResult Index(VisualizationViewModel visualizationModel)
+        public IActionResult Index(VisualizationViewModel visualizationModel, bool ModelNotValid, ICollection<string> Errors)
         {
             visualizationModel.AvailableFiles = new List<SelectListItem>();
             visualizationModel.AvailableFiles = _context.GetFileNamesAsSelectList().ToList();
@@ -40,6 +40,8 @@ namespace BloodDonationPlatform.Controllers
             {
                 visualizationModel.SelectedFiles = visualizationModel.AvailableFiles.Select(z=> z.Text).ToList();
             }
+
+            visualizationModel.Errors = Errors;
 
             visualizationModel.DonatorsWithDonations = _context.GetDonatorsWithDonations(visualizationModel.SelectedFiles);
 
@@ -105,8 +107,16 @@ namespace BloodDonationPlatform.Controllers
                 visualizationModel.BloodGroupPercentage = JsonConvert.SerializeObject(BloodGroupPercentage);
                 visualizationModel.BloodFactorPercentage = JsonConvert.SerializeObject(BloodFactorPercentage);
             }
-            
+
             // PANEL SZCZEGÓŁÓW POJEDYNCZEGO DONATORA -> COMPONENT
+
+            visualizationModel.CsvFile = null;
+            visualizationModel.NameOfFile = null;
+
+            if (!ModelNotValid)
+            {
+                ModelState.Clear();
+            }
 
             return View(visualizationModel);
         }
@@ -120,7 +130,6 @@ namespace BloodDonationPlatform.Controllers
         [HttpPost]
         public IActionResult ReadCSVFile(VisualizationViewModel visualizationModel)
         {
-
             if (ModelState.IsValid)
             {
                 if (!_context.CheckIfNameOfFileIsUnique(visualizationModel.NameOfFile))
@@ -144,25 +153,19 @@ namespace BloodDonationPlatform.Controllers
                 {
                     try
                     {
-                        _context.AddDataFromNewCSVFile(records.CollectionOfRecords, visualizationModel.NameOfFile);
+                       _context.AddDataFromNewCSVFile(records.CollectionOfRecords, visualizationModel.NameOfFile);
                     }
                     catch (Exception e)
                     {
-                        // return błędy z zapisu do bazy
+                        records.Errors.Add("There was an error during saving data to database");
                     }
                 }
-                else
-                {
-                    // records.Errors wyrzucone na widok
-                }
-
-
-                return RedirectToAction("Index");
-
+         
+                return RedirectToAction("Index", new { ModelNotValid = true, Errors = records.Errors });
             }
             else
             {
-                return RedirectToAction("Index", new {visualizationModel = visualizationModel });
+                return RedirectToAction("Index", new { ModelNotValid = true});
             }
         }
     }

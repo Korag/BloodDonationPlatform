@@ -12,6 +12,7 @@ namespace BloodDonationPlatform.ViewModels
     {
         public IFormFile CsvFile { get; set; }
         public string NameOfFile { get; set; }
+        public ICollection<string> Errors { get; set; }
 
         public ICollection<DonatorViewModel> DonatorsWithDonations { get; set; }
 

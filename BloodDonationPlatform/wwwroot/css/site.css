@@ -1,8 +1,15 @@
 ﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification\ 
 for details on configuring this project to bundle and minify static web assets. */
 body {
-    padding-top: 50px;
     padding-bottom: 20px;
+    background: rgba(167,42,54,1);
+    background: -moz-linear-gradient(left, rgba(167,42,54,1) 0%, rgba(181,60,72,1) 15%, rgba(213,103,114,1) 50%, rgba(230,51,69,1) 100%);
+    background: -webkit-gradient(left top, right top, color-stop(0%, rgba(167,42,54,1)), color-stop(15%, rgba(181,60,72,1)), color-stop(50%, rgba(213,103,114,1)), color-stop(100%, rgba(230,51,69,1)));
+    background: -webkit-linear-gradient(left, rgba(167,42,54,1) 0%, rgba(181,60,72,1) 15%, rgba(213,103,114,1) 50%, rgba(230,51,69,1) 100%);
+    background: -o-linear-gradient(left, rgba(167,42,54,1) 0%, rgba(181,60,72,1) 15%, rgba(213,103,114,1) 50%, rgba(230,51,69,1) 100%);
+    background: -ms-linear-gradient(left, rgba(167,42,54,1) 0%, rgba(181,60,72,1) 15%, rgba(213,103,114,1) 50%, rgba(230,51,69,1) 100%);
+    background: linear-gradient(to right, rgba(167,42,54,1) 0%, rgba(181,60,72,1) 15%, rgba(213,103,114,1) 50%, rgba(230,51,69,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a72a36', endColorstr='#e63345', GradientType=1 );
 }
 
 /* Wrapping element */
@@ -10,6 +17,7 @@ body {
 .body-content {
     padding-left: 15px;
     padding-right: 15px;
+    background-color:snow;
 }
 
 /* Carousel */
@@ -34,4 +42,57 @@ body {
     .carousel-caption {
         display: none;
     }
+}
+
+#topDonators {
+    width: 100%;
+    height: 500px;
+}
+
+#totalAmountInSingleFile {
+    width: 100%;
+    height: 500px;
+}
+
+#totalAmountOfDonatedBlood {
+    width: 60%;
+    height: 100%;
+    margin: auto;
+}
+
+#averageAmountOfBloodBySingleFile {
+    width: 100%;
+    height: 500px;
+}
+
+#avgQuantityOfDonatedBloodWithQuantityOfDonationsPerPerson {
+    width: 100%;
+    height: 500px;
+}
+
+#avgQuantityOfDonatedBlood {
+    width: 60%;
+    height: 100%;
+    margin:auto;
+}
+
+#avgQuantityOfDonatedBloodWithQuantityOfDonationsPerPerson {
+    width: 100%;
+    height: 500px;
+}
+
+
+#bloodGroupPercentage {
+    width: 100%;
+    height: 500px;
+}
+
+
+#bloodFactorPercentage {
+    width: 100%;
+    height: 500px;
+}
+
+h2 {
+    color: darkred;
 }

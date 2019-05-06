@@ -44,6 +44,7 @@ namespace BloodDonationPlatform.ViewModels
         public VisualizationViewModelValidator()
         {
             RuleFor(x => x.CsvFile).NotNull();
+            RuleFor(x => x.NameOfFile).NotNull();
         }
     }
 }

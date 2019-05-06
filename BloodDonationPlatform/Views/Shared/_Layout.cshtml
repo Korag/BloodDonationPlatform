@@ -3,42 +3,41 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - BloodDonationPlatform</title>
+    <title>@ViewData["Title"] </title>
 
     <environment include="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
         <link rel="stylesheet" href="~/css/site.css" />
     </environment>
     <environment exclude="Development">
-        <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
+        <link rel="stylesheet" href="@*https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css*@"
               asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
               asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
         <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
     </environment>
 </head>
 <body>
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">BloodDonationPlatform</a>
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
-                </ul>
+    <nav class="navbar navbar-expand-lg sticky-top navbar-dark" style="width:100%; margin:auto; background-color: maroon">
+        <img src="~/images/blood_drop.png" style="width:50px; height:50px;"/>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-item nav-link active" href="#AddNewCsvFile">Add new CSV</a>
+                <a class="nav-item nav-link active" href="#SelectFilesToVisualize">Select files</a>
+                <a class="nav-item nav-link active" href="#totalAmountOfDonatedBlood">Total Amount of Donated Blood</a>
+                <a class="nav-item nav-link active" href="#avgQuantityOfDonatedBlood">Average quantity of Donated Blood</a>
+                <a class="nav-item nav-link active" href="#topDonators">Top Donators</a>
+                <a class="nav-item nav-link active" href="#totalAmountInSingleFile">Total Donated Blood per File</a>
+                <a class="nav-item nav-link active" href="#averageAmountOfBloodBySingleFile">Average Donated Blood per File</a>
+                <a class="nav-item nav-link active" href="#avgQuantityOfDonatedBloodWithQuantityOfDonationsPerPerson">Average Donated Blood per Person</a>
+                <a class="nav-item nav-link active" href="#bloodGroupPercentage">Percentage of Blood Group</a>
+                <a class="nav-item nav-link active" href="#bloodFactorPercentage">Percentage of Blood Factor</a>
+                <a class="nav-item nav-link active" href="#singleDonatorDetails">Single Donator Details</a>
             </div>
         </div>
     </nav>
-
-    <partial name="_CookieConsentPartial" />
 
     <div class="container body-content">
         @RenderBody()

@@ -35,12 +35,12 @@
         </form>
         @if (Model.Errors.Count != 0)
         {
-        <div class="alert alert-danger" role="alert">
-            @foreach (var error in Model.Errors)
-            {
-                <p>@error</p>
-            }
-        </div>
+            <div class="alert alert-danger" role="alert">
+                @foreach (var error in Model.Errors)
+                {
+                    <p>@error</p>
+                }
+            </div>
         }
     </div>
 </div>
@@ -99,6 +99,11 @@
 
     <h2>Percentage how many donators have concrete Blood Factor</h2>
     <div id="bloodFactorPercentage"></div>
+
+    <h2>Donators Details</h2>
+    <div id="donatorsDetails" class="pt-3">
+        @await Component.InvokeAsync("DonatorsTable", new { donatorsWithDonations = Model.DonatorsWithDonations })
+    </div>
 }
 
 
@@ -108,6 +113,10 @@
     <script src="https://www.amcharts.com/lib/4/core.js"></script>
     <script src="https://www.amcharts.com/lib/4/charts.js"></script>
     <script src="https://www.amcharts.com/lib/4/themes/animated.js"></script>
+
+    <script>
+        $('#donatorsTable').dataTable({});
+    </script>
 
     @*Top Donators*@
     <script>

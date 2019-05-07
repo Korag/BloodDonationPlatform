@@ -96,3 +96,17 @@ body {
 h2 {
     color: darkred;
 }
+
+.table-striped > tbody > tr:nth-child(odd) > td,
+.table-striped > tbody > tr:nth-child(odd) > th {
+
+}
+
+.page-link {
+    color: #c31515;
+}
+
+.page-item.active .page-link {
+    background-color: #a22020;
+    border-color: #fffa58;
+}

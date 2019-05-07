@@ -31,7 +31,7 @@ namespace BloodDonationPlatform.Services
                 CollectionOfRecords = new List<ReadFromCSVViewModel>(),
                 Errors = new List<string>()
             };
-    
+
             using (var reader = new StreamReader(path))
             {
                 try
@@ -44,7 +44,17 @@ namespace BloodDonationPlatform.Services
                         csv.Configuration.Delimiter = ",";
                         csv.Configuration.MissingFieldFound = null;
 
-                        records.CollectionOfRecords = csv.GetRecords<ReadFromCSVViewModel>().ToList();
+                        try
+                        {
+                            records.CollectionOfRecords = csv.GetRecords<ReadFromCSVViewModel>().ToList();
+                        }
+
+                        catch (ReaderException ex)
+                        {
+                            records.Errors.Add("Property: '" + IndexOfProperty.GetValueOrDefault(ex.ReadingContext.CurrentIndex) + "' - failed validation. Error was: " + ex.InnerException.Message);
+                            records.Errors.Add("Wrong value of input: '" + ex.ReadingContext.Record[ex.ReadingContext.CurrentIndex] + "'.");
+                            records.Errors.Add("Row number in file: " + ex.ReadingContext.Row);
+                        }
 
                         ReadFromCSVValidator validator = new ReadFromCSVValidator();
 
@@ -57,9 +67,9 @@ namespace BloodDonationPlatform.Services
                             {
                                 foreach (var failure in results.Errors)
                                 {
-                                    records.Errors.Add("Property " + failure.PropertyName + " failed validation. Error was: " + failure.ErrorMessage);
-                                    records.Errors.Add("Wrong value of input '" + failure.AttemptedValue + "'.");
-                                    records.Errors.Add("Row number in file " + rowNumber);
+                                    records.Errors.Add("Property: '" + failure.PropertyName + "' - failed validation. Error was: " + failure.ErrorMessage);
+                                    records.Errors.Add("Wrong value of input: '" + failure.AttemptedValue + "'.");
+                                    records.Errors.Add("Row number in file: " + rowNumber);
                                 }
                             }
                             rowNumber++;
@@ -70,9 +80,9 @@ namespace BloodDonationPlatform.Services
 
                 catch (TypeConverterException ex)
                 {
-                    records.Errors.Add("Property " + IndexOfProperty.GetValueOrDefault(ex.ReadingContext.CurrentIndex) + " failed validation. Error was: " + ex.Message);
-                    records.Errors.Add("Wrong value of input '" + ex.Text + "'.");
-                    records.Errors.Add("Row number in file " + ex.ReadingContext.Row);
+                    records.Errors.Add("Property: '" + IndexOfProperty.GetValueOrDefault(ex.ReadingContext.CurrentIndex) + "' - failed validation. Error was: " + ex.Message);
+                    records.Errors.Add("Wrong value of input: '" + ex.Text + "'.");
+                    records.Errors.Add("Row number in file: " + ex.ReadingContext.Row);
                 }
             }
 

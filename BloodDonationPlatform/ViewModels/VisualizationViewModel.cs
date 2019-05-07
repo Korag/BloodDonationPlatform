@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -10,7 +11,9 @@ namespace BloodDonationPlatform.ViewModels
 {
     public class VisualizationViewModel
     {
+        [Display(Name="File")]
         public IFormFile CsvFile { get; set; }
+        [Display(Name = "File name")]
         public string NameOfFile { get; set; }
         public ICollection<string> Errors { get; set; }
 

@@ -28,7 +28,7 @@ namespace BloodDonationPlatform.ViewModels
             Map(m => m.BloodGroup).NameIndex(3); 
             Map(m => m.BloodFactor).NameIndex(4);
             Map(m => m.QuantityOfBlood).NameIndex(5);
-            Map(m => m.DateOfDonation).NameIndex(6); 
+            Map(m => m.DateOfDonation).NameIndex(6).ToString(); 
             Map(m => m.PlaceOfDonation).NameIndex(7); 
         }
     }

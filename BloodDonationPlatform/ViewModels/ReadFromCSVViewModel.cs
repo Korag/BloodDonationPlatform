@@ -22,14 +22,14 @@ namespace BloodDonationPlatform.ViewModels
     {
         public ReadFromCSVViewModelMapper()
         {
-            Map(m => m.FirstName).NameIndex(0);
-            Map(m => m.LastName).NameIndex(1); 
-            Map(m => m.PESEL).NameIndex(2); 
-            Map(m => m.BloodGroup).NameIndex(3); 
-            Map(m => m.BloodFactor).NameIndex(4);
-            Map(m => m.QuantityOfBlood).NameIndex(5);
-            Map(m => m.DateOfDonation).NameIndex(6).ToString(); 
-            Map(m => m.PlaceOfDonation).NameIndex(7); 
+            Map(m => m.FirstName).Name("firstname", "first name", "imie", "imię");
+            Map(m => m.LastName).Name("lastname", "last name", "nazwisko");
+            Map(m => m.PESEL).Name("pesel"); 
+            Map(m => m.BloodGroup).Name("bloodgroup", "blood group", "grupakrwi", "grupa krwi");
+            Map(m => m.BloodFactor).Name("bloodfactor", "blood factor", "czynnikkrwi", "czynnik krwi");
+            Map(m => m.QuantityOfBlood).Name("quantityofblood", "quantity ofblood", "quantityof blood", "quantity of blood", "ilosc", "ilość", "ilosc krwi", "ilosckrwi", "ilość krwi", "ilośćkrwi");
+            Map(m => m.DateOfDonation).Name("date", "dateofdonation", "date ofdonation", "dateof donation", "date of donation", "data", "dataoddaniakrwi", "data oddaniakrwi", "dataoddania krwi", "data oddania krwi"); 
+            Map(m => m.PlaceOfDonation).Name("place", "placeofdonation", "place ofdonation", "placeof donation", "place of donation", "miejsce", "miejsceoddaniakrwi", "miejsce oddaniakrwi", "miejsceoddania krwi", "miejsce oddania krwi"); 
         }
     }
 

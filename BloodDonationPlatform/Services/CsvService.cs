@@ -38,8 +38,8 @@ namespace BloodDonationPlatform.Services
                 {
                     using (var csv = new CsvReader(reader))
                     {
-                        //csv.Configuration.PrepareHeaderForMatch = (string header, int index) => header.ToLower();
-                        csv.Configuration.HasHeaderRecord = false;
+                        csv.Configuration.PrepareHeaderForMatch = (string header, int index) => header.ToLower();
+                        csv.Configuration.HasHeaderRecord = true;
                         csv.Configuration.RegisterClassMap<ReadFromCSVViewModelMapper>();
                         csv.Configuration.Delimiter = ",";
                         csv.Configuration.MissingFieldFound = null;

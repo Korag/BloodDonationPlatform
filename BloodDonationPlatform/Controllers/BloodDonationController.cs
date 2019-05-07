@@ -154,13 +154,14 @@ namespace BloodDonationPlatform.Controllers
                     try
                     {
                        _context.AddDataFromNewCSVFile(records.CollectionOfRecords, visualizationModel.NameOfFile);
+                        return RedirectToAction("Index", new { ModelNotValid = false });
                     }
                     catch (Exception e)
                     {
                         records.Errors.Add("There was an error during saving data to database");
                     }
                 }
-         
+
                 return RedirectToAction("Index", new { ModelNotValid = true, Errors = records.Errors });
             }
             else

@@ -1,0 +1,77 @@
+﻿@model IEnumerable<BloodDonationPlatform.ViewModels.DonatorViewModel>
+
+
+<table class="table-responsive table-hover table-striped table-bordered" style="border-color:mediumvioletred; border-collapse: unset;" id="donatorsTable">
+    <thead style="text-align:center">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LastName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BloodGroup)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BloodFactor)
+            </th>
+            <th>
+
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Donations.First().DateOfDonation)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Donations.First().PlaceOfDonation)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Donations.First().QuantityOfBlood)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Donations.First().OriginFileName)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FirstName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LastName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BloodGroup)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BloodFactor)
+                </td>
+                <td>
+                    <ul style="text-align:center; margin:auto;" >
+                        @foreach (var donation in item.Donations)
+                        {
+                            <li>
+                                <td style="padding-right:10px"> 
+                                    @donation.DateOfDonation.ToShortDateString()
+                                </td>
+                                <td>
+                                    @donation.PlaceOfDonation
+                                </td>
+                                <td style="padding-right:10px">
+                                    @donation.QuantityOfBlood (ml)
+                                </td>
+                                <td>
+                                    @donation.OriginFileName
+                                </td>
+                            </li>
+                        }
+                   </ul>
+                </td>
+                </tr>
+        }
+    </tbody>
+</table>
+

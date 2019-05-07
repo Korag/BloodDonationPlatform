@@ -13,7 +13,7 @@ namespace BloodDonationPlatform.ViewModels
     {
         [Display(Name="File")]
         public IFormFile CsvFile { get; set; }
-        [Display(Name = "File name")]
+        [Display(Name = "File Name")]
         public string NameOfFile { get; set; }
         public ICollection<string> Errors { get; set; }
 

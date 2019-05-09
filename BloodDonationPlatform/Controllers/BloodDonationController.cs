@@ -108,8 +108,6 @@ namespace BloodDonationPlatform.Controllers
                 visualizationModel.BloodFactorPercentage = JsonConvert.SerializeObject(BloodFactorPercentage);
             }
 
-            // PANEL SZCZEGÓŁÓW POJEDYNCZEGO DONATORA -> COMPONENT
-
             visualizationModel.CsvFile = null;
             visualizationModel.NameOfFile = null;
 
@@ -126,6 +124,14 @@ namespace BloodDonationPlatform.Controllers
         {
             return RedirectToAction("Index", new { SelectedFiles = visualizationModel.SelectedFiles });
         }
+
+        public IActionResult Delete(string fileName)
+        {
+            _context.DeleteFile(fileName);
+
+            return RedirectToAction("Index");
+        }
+
 
         [HttpPost]
         public IActionResult ReadCSVFile(VisualizationViewModel visualizationModel)

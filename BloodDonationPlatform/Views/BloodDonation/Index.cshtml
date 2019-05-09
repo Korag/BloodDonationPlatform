@@ -45,37 +45,40 @@
     </div>
 </div>
 
-<div class="form-group mt-4">
-    <form asp-action="SelectFiles">
-        <h3 style="text-align:center; color:brown">Available files</h3>
-        <div class="col-10" id="SelectFilesToVisualize">
-            <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                @foreach (var availableFile in Model.AvailableFiles)
-                {
-                    @*<div id="checkbox-list">*@
-                    <label class="btn btn-outline-secondary mr-2
-                    @if (Model.SelectedFiles.Contains(availableFile.Value))
-                    { <text> active </text>} ">
-                        <input type="checkbox"
-                               name="SelectedFiles"
-                               value="@availableFile.Value"
-                               autocomplete="off"
-                               @if (Model.SelectedFiles.Contains(availableFile.Value)) { <text> checked </text> } />
-                        <span>@availableFile.Text</span>
-                    </label>
-                }
-            </div>
-            @Html.ValidationMessageFor(model => model.SelectedFiles, "", new { @class = "text-danger" })
-        </div>
-        <div class="form-group text-center mt-3">
-            <input type="submit" value="Visualize" class="btn btn-danger" />
-        </div>
-    </form>
-</div>
-
-
 @if (Model.DonatorsWithDonations.Count != 0)
 {
+
+    <div class="form-group mt-4">
+        <form asp-action="SelectFiles">
+            <h3 style="text-align:center; color:brown">Available files</h3>
+            <div class="col-10" id="SelectFilesToVisualize">
+                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                    @foreach (var availableFile in Model.AvailableFiles)
+                    {
+                        @*<div id="checkbox-list">*@
+                        <label class="btn btn-outline-secondary mr-2
+                    @if (Model.SelectedFiles.Contains(availableFile.Value))
+                    { <text> active </text>} ">
+                            <input type="checkbox"
+                                   name="SelectedFiles"
+                                   value="@availableFile.Value"
+                                   autocomplete="off"
+                                   @if (Model.SelectedFiles.Contains(availableFile.Value)) { <text> checked </text> } />
+                            <span>@availableFile.Text</span>
+                        </label>
+                        <a class="delete-link delete fas fa-times mr-2" style="color:#C90202" data-id="@availableFile.Value"
+                           data-controller="BloodDonation" data-action="Delete"></a>
+                    }
+                </div>
+                @Html.ValidationMessageFor(model => model.SelectedFiles, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group text-center mt-3">
+                <input type="submit" value="Visualize" class="btn btn-danger" />
+            </div>
+        </form>
+    </div>
+
+
     <h2>Total amount of donated blood</h2>
     <div id="totalAmountOfDonatedBlood"></div>
 
@@ -116,6 +119,66 @@
 
     <script>
         $('#donatorsTable').dataTable({});
+    </script>
+
+    <script>
+        $((function () {
+            var url;
+            var redirectUrl;
+            var target;
+
+            $('body').append(`
+            <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"></span></button>
+                            <h4 class="modal-title" id="myModalLabel">Warning</h4>
+                        </div>
+                        <div class="modal-body delete-modal-body">
+                        Are you sure you want delete this file?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal" id="cancel-delete">Cancel</button>
+                            <button type="button" class="btn btn-danger" id="confirm-delete">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>`);
+
+            //Delete Action
+            $(".delete").on('click', (e) => {
+                e.preventDefault();
+
+                target = e.target;
+                var Id = $(target).data('id');
+                var controller = $(target).data('controller');
+                var action = $(target).data('action');
+                var bodyMessage = $(target).data('body-message');
+                redirectUrl = $(target).data('redirect-url');
+
+                url = "/" + controller + "/" + action + "?fileName=" + Id;
+                $(".delete-modal-body").text(bodyMessage);
+                $("#deleteModal").modal('show');
+            });
+
+            $("#confirm-delete").on('click', () => {
+                $.get(url)
+                    .done((result) => {
+                        if (!redirectUrl) {
+                            return $(target).parent().parent().hide("slow");
+                        }
+                        window.location.href = redirectUrl;
+                    })
+                    .fail((error) => {
+                        if (redirectUrl)
+                            window.location.href = redirectUrl;
+                    }).always(() => {
+                        $("#deleteModal").modal('hide');
+                    });
+            });
+
+        }()));
     </script>
 
     @*Top Donators*@

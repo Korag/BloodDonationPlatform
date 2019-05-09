@@ -50,6 +50,8 @@ namespace BloodDonationPlatform.DAL
                 donation.DonatorId = id;
                 AddNewDonation(donation);
             }
+
+            _context.SaveChanges();
         }
 
         public bool CheckIfNameOfFileIsUnique(string NameOfFile)
@@ -75,13 +77,11 @@ namespace BloodDonationPlatform.DAL
         public void AddNewDonation(Donation donation)
         {
             _context.Donations.Add(donation);
-            _context.SaveChanges();
         }
 
         public void AddNewDonator(Donator donator)
         {
             _context.Donators.Add(donator);
-            _context.SaveChanges();
         }
 
         public bool IfDonatorExists(Donator donator)
@@ -155,6 +155,27 @@ namespace BloodDonationPlatform.DAL
             }
 
             return DonatorsWithDonations;
+        }
+
+        public void DeleteFile(string fileName)
+        {
+            var DonationsToRemove = _context.Donations.Where(z => z.OriginFileName == fileName).ToList();
+            var DonatorsFromRemovedFile = _context.Donations.Where(z => z.OriginFileName == fileName).Select(z => z.DonatorId).ToList();
+
+            _context.Donations.RemoveRange(DonationsToRemove);
+
+            var Donators = _context.Donators.ToList();
+            var DonatorsDonationCount = _context.Donations.Where(z => DonatorsFromRemovedFile.Contains(z.DonatorId)).GroupBy(z => z.DonatorId).Select(x => new { DonatorId = x.Key, QuantityOfDonations = x.Count() }).ToList();
+
+            foreach (var donator in DonatorsDonationCount)
+            {
+                if (donator.QuantityOfDonations == 1)
+                {
+                    _context.Donators.Remove(Donators.Where(z => z.DonatorId == donator.DonatorId).FirstOrDefault());
+                }
+            }
+
+            _context.SaveChanges();
         }
 
     }
